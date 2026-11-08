@@ -21,7 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BUNDLE = HERE if os.path.isfile(os.path.join(HERE, "game.py")) else os.path.dirname(HERE)
 sys.path.insert(0, BUNDLE)  # so agent.py can import game.py and evaluator.py
 
-from game import Action, AgentConfig, Game, make_deal  # noqa: E402
+from game import Action, AgentConfig, Game, default_action, make_deal  # noqa: E402
 from judge_engine import coerce_action  # noqa: E402  (reads answers exactly like the judge)
 
 TOKEN = "test-token"
@@ -195,3 +195,26 @@ def test_reads_port_from_environment():
 # ---------------------------------------------------------------------------
 # Add your own tests below, e.g. "with two aces preflop my bot raises".
 # ---------------------------------------------------------------------------
+
+def test_exception_in_choose_action_returns_legal_fallback(bot):
+    # A bug inside the policy must not become an HTTP 500. The wrapper plays
+    # the judge's default action instead, which is always legal.
+    import runtime.policy as policy
+
+    _module, client = bot
+    start_half(client)
+    obs = Game(make_deal(1, 0), 0).observation(0)
+
+    def boom(obs, memory):
+        raise RuntimeError("boom")
+
+    original = policy.inner_action
+    policy.inner_action = boom
+    try:
+        response = client.post("/act", json={"observation": obs.to_dict(), "hand_results": []}, headers=AUTH)
+    finally:
+        policy.inner_action = original
+    assert response.status_code == 200, response.json()
+    action = coerce_action(response.json()["action"])
+    assert action == default_action(obs.to_call)
+    assert action in obs.legal_actions

@@ -1,0 +1,68 @@
+{
+  "algo": "ppo",
+  "iteration": 55771,
+  "wall_time": 1794155402.14114,
+  "encoder_version": "v1",
+  "net_arch": {
+    "in": 182,
+    "hidden": 256,
+    "layers": 3,
+    "out": 4,
+    "value": true
+  },
+  "files": [
+    "weights.f32"
+  ],
+  "notes": "PPO actor, update 55771. Shipped policy.",
+  "param_order": [
+    "W0",
+    "b0",
+    "W1",
+    "b1",
+    "W2",
+    "b2",
+    "Wpi",
+    "bpi",
+    "Wv",
+    "bv"
+  ],
+  "shapes": {
+    "W0": [
+      182,
+      256
+    ],
+    "b0": [
+      256
+    ],
+    "W1": [
+      256,
+      256
+    ],
+    "b1": [
+      256
+    ],
+    "W2": [
+      256,
+      256
+    ],
+    "b2": [
+      256
+    ],
+    "Wpi": [
+      256,
+      4
+    ],
+    "bpi": [
+      4
+    ],
+    "Wv": [
+      256,
+      1
+    ],
+    "bv": [
+      1
+    ]
+  },
+  "elo_learner": 2157.0799308432847,
+  "kl_coef": 0.02
+}
